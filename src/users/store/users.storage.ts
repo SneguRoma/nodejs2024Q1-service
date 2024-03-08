@@ -4,10 +4,20 @@ import { IUser } from '../interfaces/user.interface';
 
 import { CreateUserDto } from '../dto/create-user.dto';
 import { User } from '../entities/user.entity';
+//import { UpdateUserDto } from '../dto/update-user.dto';
 
 @Injectable()
 export class UsersStorage implements IUserStorage {
-  users: IUser[] = [];
+  users: IUser[] = [
+    {
+      id: '4205d419-a068-4115-9462-c64e78ad247c',
+      login: 'string',
+      password: 'string',
+      version: 1,
+      createdAt: 1709914791,
+      updatedAt: 1709914791,
+    },
+  ];
 
   get(): IUser[] {
     return this.users;
@@ -23,5 +33,12 @@ export class UsersStorage implements IUserStorage {
 
     this.users.push(newUser);
     return newUser;
+  }
+
+  updateUser(updatePass: string, id: string): IUser {
+    const updatedUser = this.getUser(id);
+
+    updatedUser.password = updatePass;
+    return updatedUser;
   }
 }

@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
-import { UpdateUserDto } from './dto/update-user.dto';
+//import { UpdateUserDto } from './dto/update-user.dto';
 import { UsersStorage } from './store/users.storage';
 
 @Injectable()
@@ -19,8 +19,8 @@ export class UsersService {
     return this.storage.getUser(id);
   }
 
-  update(id: number, updateUserDto: UpdateUserDto) {
-    return `This action updates a #${id} user` + updateUserDto;
+  update(id: string, newPass: string) {
+    return this.storage.updateUser(newPass, id);
   }
 
   remove(id: number) {

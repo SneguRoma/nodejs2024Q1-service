@@ -3,11 +3,11 @@ import {
   Get,
   Post,
   Body,
-  Patch,
   Param,
   Delete,
   HttpStatus,
   Res,
+  Put,
 } from '@nestjs/common';
 import { Response } from 'express';
 import { UsersService } from './users.service';
@@ -53,17 +53,48 @@ export class UsersController {
         .status(HttpStatus.BAD_REQUEST)
         .json({ error: 'Invalid userId format' });
     } else {
-      const a = this.usersService.findOne(id);
-      if (a) return res.status(HttpStatus.OK).json(a);
+      const findedUser = this.usersService.findOne(id);
+      if (findedUser) return res.status(HttpStatus.OK).json(findedUser);
       return res
         .status(HttpStatus.NOT_FOUND)
         .json({ error: 'user does not exist' });
     }
   }
 
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
-    return this.usersService.update(+id, updateUserDto);
+  @Put(':id')
+  update(
+    @Param('id') id: string,
+    @Body() updateUserDto: UpdateUserDto,
+    @Res() res: Response,
+  ) {
+    try {
+      if (id.length !== 36) {
+        return res
+          .status(HttpStatus.BAD_REQUEST)
+          .json({ error: 'Invalid userId format' });
+      }
+      const findedUser = this.usersService.findOne(id);
+      const { oldPassword, newPassword } = updateUserDto;
+      if (findedUser) {
+        if (findedUser.password === oldPassword) {
+          return res
+            .status(HttpStatus.OK)
+            .json(this.usersService.update(id, newPassword));
+        } else {
+          return res
+            .status(HttpStatus.FORBIDDEN)
+            .json({ error: 'incorrect password' });
+        }
+      }
+      return res
+        .status(HttpStatus.NOT_FOUND)
+        .json({ error: 'user does not exist' });
+    } catch (error) {
+      console.error('Error in create:', error);
+      return res
+        .status(HttpStatus.INTERNAL_SERVER_ERROR)
+        .json({ error: 'Internal Server Error' });
+    }
   }
 
   @Delete(':id')

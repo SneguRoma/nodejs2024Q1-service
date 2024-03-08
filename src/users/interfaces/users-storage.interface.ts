@@ -4,6 +4,7 @@ import { CreateUserDto } from '../dto/create-user.dto';
 export interface IUserStorage {
   get(): IUser[];
   getUser(id: string): IUser;
-  createUser(createUse: CreateUserDto): IUser;
+  createUser(createUser: CreateUserDto): IUser;
+  updateUser(updatePass: string, id: string): IUser;
   users: IUser[];
 }
