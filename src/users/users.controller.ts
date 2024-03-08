@@ -19,8 +19,23 @@ export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
   @Post()
-  create(@Body() createUserDto: CreateUserDto) {
-    return this.usersService.create(createUserDto);
+  create(@Body() createUserDto: CreateUserDto, @Res() res: Response) {
+    try {
+      if (!createUserDto.login || !createUserDto.password) {
+        return res
+          .status(HttpStatus.BAD_REQUEST)
+          .json({ error: 'Login and password are required' });
+      }
+
+      return res
+        .status(HttpStatus.CREATED)
+        .json(this.usersService.create(createUserDto));
+    } catch (error) {
+      console.error('Error in create:', error);
+      return res
+        .status(HttpStatus.INTERNAL_SERVER_ERROR)
+        .json({ error: 'Internal Server Error' });
+    }
   }
 
   @Get()
@@ -33,7 +48,7 @@ export class UsersController {
     //const isValidUUID = id.length === 6? true : false;
     //const uuidRegex = /^[a-fA-F0-9]{6}$/;
 
-    if (id.length !== 6) {
+    if (id.length !== 36) {
       return res
         .status(HttpStatus.BAD_REQUEST)
         .json({ error: 'Invalid userId format' });

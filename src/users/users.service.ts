@@ -8,7 +8,7 @@ export class UsersService {
   constructor(private storage: UsersStorage) {}
 
   create(createUserDto: CreateUserDto) {
-    return 'This action adds a new user' + createUserDto;
+    return this.storage.createUser(createUserDto);
   }
 
   findAll() {
