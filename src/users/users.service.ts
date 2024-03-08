@@ -15,8 +15,8 @@ export class UsersService {
     return this.storage.get();
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} user`;
+  findOne(id: string) {
+    return this.storage.getUser(id);
   }
 
   update(id: number, updateUserDto: UpdateUserDto) {

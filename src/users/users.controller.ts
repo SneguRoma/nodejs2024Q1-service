@@ -6,7 +6,10 @@ import {
   Patch,
   Param,
   Delete,
+  HttpStatus,
+  Res,
 } from '@nestjs/common';
+import { Response } from 'express';
 import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
@@ -26,8 +29,21 @@ export class UsersController {
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.usersService.findOne(+id);
+  findOne(@Param('id') id: string, @Res() res: Response) {
+    //const isValidUUID = id.length === 6? true : false;
+    //const uuidRegex = /^[a-fA-F0-9]{6}$/;
+
+    if (id.length !== 6) {
+      return res
+        .status(HttpStatus.BAD_REQUEST)
+        .json({ error: 'Invalid userId format' });
+    } else {
+      const a = this.usersService.findOne(id);
+      if (a) return res.status(HttpStatus.OK).json(a);
+      return res
+        .status(HttpStatus.NOT_FOUND)
+        .json({ error: 'user does not exist' });
+    }
   }
 
   @Patch(':id')

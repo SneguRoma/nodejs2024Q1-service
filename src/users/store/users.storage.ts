@@ -18,4 +18,8 @@ export class UsersStorage implements IUserStorage {
   get(): IUser[] {
     return this.users;
   }
+
+  getUser(id: string): IUser {
+    return this.users.find((user) => user.id === id);
+  }
 }
