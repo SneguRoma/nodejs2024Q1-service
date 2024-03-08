@@ -23,7 +23,7 @@ export class UsersService {
     return this.storage.updateUser(newPass, id);
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} user`;
+  remove(id: string) {
+    this.storage.deleteUser(id);
   }
 }

@@ -6,5 +6,6 @@ export interface IUserStorage {
   getUser(id: string): IUser;
   createUser(createUser: CreateUserDto): IUser;
   updateUser(updatePass: string, id: string): IUser;
+  deleteUser(id: string): void;
   users: IUser[];
 }

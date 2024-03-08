@@ -98,7 +98,22 @@ export class UsersController {
   }
 
   @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.usersService.remove(+id);
+  remove(@Param('id') id: string, @Res() res: Response) {
+    if (id.length !== 36) {
+      return res
+        .status(HttpStatus.BAD_REQUEST)
+        .json({ error: 'Invalid userId format' });
+    } else {
+      const findedUser = this.usersService.findOne(id);
+
+      if (findedUser) {
+        return res
+          .status(HttpStatus.NO_CONTENT)
+          .send(this.usersService.remove(id));
+      }
+      return res
+        .status(HttpStatus.NOT_FOUND)
+        .json({ error: 'user does not exist' });
+    }
   }
 }

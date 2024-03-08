@@ -41,4 +41,11 @@ export class UsersStorage implements IUserStorage {
     updatedUser.password = updatePass;
     return updatedUser;
   }
+
+  deleteUser(id: string): void {
+    const newUsers = this.users.filter(
+      (user: { id: string }) => user.id !== id,
+    );
+    this.users = newUsers;
+  }
 }
