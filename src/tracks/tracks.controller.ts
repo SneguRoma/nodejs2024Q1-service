@@ -3,21 +3,41 @@ import {
   Get,
   Post,
   Body,
-  Patch,
   Param,
   Delete,
+  Put,
+  Res,
+  HttpStatus,
 } from '@nestjs/common';
+import { Response } from 'express';
 import { TracksService } from './tracks.service';
 import { CreateTrackDto } from './dto/create-track.dto';
 import { UpdateTrackDto } from './dto/update-track.dto';
+//import { Track } from './entities/track.entity';
+//import { UpdateTrackDto } from './dto/update-track.dto';
 
 @Controller('track')
 export class TracksController {
   constructor(private readonly tracksService: TracksService) {}
 
   @Post()
-  create(@Body() createTrackDto: CreateTrackDto) {
-    return this.tracksService.create(createTrackDto);
+  create(@Body() createTrackDto: CreateTrackDto, @Res() res: Response) {
+    try {
+      if (!createTrackDto.name || !createTrackDto.duration) {
+        return res
+          .status(HttpStatus.BAD_REQUEST)
+          .json({ error: 'name and duration are required' });
+      }
+
+      return res
+        .status(HttpStatus.CREATED)
+        .json(this.tracksService.create(createTrackDto));
+    } catch (error) {
+      console.error('Error in create:', error);
+      return res
+        .status(HttpStatus.INTERNAL_SERVER_ERROR)
+        .json({ error: 'Internal Server Error' });
+    }
   }
 
   @Get()
@@ -26,17 +46,73 @@ export class TracksController {
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.tracksService.findOne(+id);
+  findOne(@Param('id') id: string, @Res() res: Response) {
+    if (id.length !== 36) {
+      return res
+        .status(HttpStatus.BAD_REQUEST)
+        .json({ error: 'Invalid trackId format' });
+    } else {
+      const findedUser = this.tracksService.findOne(id);
+      if (findedUser)
+        return res.status(HttpStatus.OK).json(this.tracksService.findOne(id));
+      return res
+        .status(HttpStatus.NOT_FOUND)
+        .json({ error: 'track does not exist' });
+    }
   }
 
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateTrackDto: UpdateTrackDto) {
-    return this.tracksService.update(+id, updateTrackDto);
+  @Put(':id')
+  update(
+    @Param('id') id: string,
+    @Body() updateTrackDto: UpdateTrackDto,
+    @Res() res: Response,
+  ) {
+    try {
+      if (id.length !== 36) {
+        return res
+          .status(HttpStatus.BAD_REQUEST)
+          .json({ error: 'Invalid trackId format' });
+      }
+      const { name, duration } = updateTrackDto;
+      if (!name || !duration) {
+        return res
+          .status(HttpStatus.BAD_REQUEST)
+          .json({ error: 'Invalid DTO format' });
+      }
+      const findedUser = this.tracksService.findOne(id);
+      if (findedUser) {
+        return res
+          .status(HttpStatus.OK)
+          .json(this.tracksService.update(id, updateTrackDto));
+      }
+      return res
+        .status(HttpStatus.NOT_FOUND)
+        .json({ error: 'track does not exist' });
+    } catch (error) {
+      console.error('Error in create:', error);
+      return res
+        .status(HttpStatus.INTERNAL_SERVER_ERROR)
+        .json({ error: 'Internal Server Error' });
+    }
   }
 
   @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.tracksService.remove(+id);
+  remove(@Param('id') id: string, @Res() res: Response) {
+    if (id.length !== 36) {
+      return res
+        .status(HttpStatus.BAD_REQUEST)
+        .json({ error: 'Invalid trackId format' });
+    } else {
+      const findedUser = this.tracksService.findOne(id);
+
+      if (findedUser) {
+        return res
+          .status(HttpStatus.NO_CONTENT)
+          .send(this.tracksService.remove(id));
+      }
+      return res
+        .status(HttpStatus.NOT_FOUND)
+        .json({ error: 'track does not exist' });
+    }
   }
 }

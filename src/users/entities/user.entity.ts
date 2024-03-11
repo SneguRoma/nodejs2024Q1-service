@@ -19,13 +19,4 @@ export class User implements IUser {
     this.createdAt = Date.now(); // timestamp of creation
     this.updatedAt = Date.now(); // timestamp of last update
   }
-
-  /* constructor(login: string, password: string) {
-    this.id = uuidv4();
-    this.login = login;
-    this.password = password;
-    this.version = 1;
-    this.createdAt = Math.floor(Date.now() / 1000); // timestamp of creation
-    this.updatedAt = Math.floor(Date.now() / 1000); // timestamp of last update
-  } */
 }
