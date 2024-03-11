@@ -50,6 +50,28 @@ export class FavoritesService {
     return this.storage.deleteArtist(id);
   }
   findAll() {
-    return this.storage.get();
+    const favArtists = this.storage.get().artists.map((artId) => {
+      const result = this.artistStorage
+        .get()
+        .find((artist) => artist.id === artId);
+      return result;
+    });
+    const favAlbums = this.storage.get().albums.map((albId) => {
+      const result = this.albumStorage
+        .get()
+        .find((album) => album.id === albId);
+      return result;
+    });
+    const favTracks = this.storage.get().tracks.map((trackId) => {
+      const result = this.trackStorage
+        .get()
+        .find((track) => track.id === trackId);
+      return result;
+    });
+    return {
+      artists: favArtists,
+      albums: favAlbums,
+      tracks: favTracks,
+    };
   }
 }

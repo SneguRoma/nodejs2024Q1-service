@@ -23,7 +23,8 @@ export class FavoritesController {
           .json({ error: 'Invalid Id format' });
       } else {
         const resp = this.favoritesService.addTrack(id);
-        if (resp === 201) return res.status(HttpStatus.OK).send('Track added');
+        if (resp === 201)
+          return res.status(HttpStatus.CREATED).send('Track added');
         return res
           .status(HttpStatus.UNPROCESSABLE_ENTITY)
           .json({ error: 'track does not exist' });
@@ -45,7 +46,8 @@ export class FavoritesController {
           .json({ error: 'Invalid Id format' });
       } else {
         const resp = this.favoritesService.addAlbum(id);
-        if (resp === 201) return res.status(HttpStatus.OK).send('Album added');
+        if (resp === 201)
+          return res.status(HttpStatus.CREATED).send('Album added');
         return res
           .status(HttpStatus.UNPROCESSABLE_ENTITY)
           .json({ error: 'album does not exist' });
@@ -67,7 +69,8 @@ export class FavoritesController {
           .json({ error: 'Invalid Id format' });
       } else {
         const resp = this.favoritesService.addArtist(id);
-        if (resp === 201) return res.status(HttpStatus.OK).send('Artist added');
+        if (resp === 201)
+          return res.status(HttpStatus.CREATED).send('Artist added');
         return res
           .status(HttpStatus.UNPROCESSABLE_ENTITY)
           .json({ error: 'album does not exist' });
