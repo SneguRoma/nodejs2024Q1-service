@@ -1,26 +1,55 @@
 import { Injectable } from '@nestjs/common';
-import { CreateFavoriteDto } from './dto/create-favorite.dto';
-import { UpdateFavoriteDto } from './dto/update-favorite.dto';
+
+import { FavoritesStorage } from './store/favorites.storage';
+import { TracksStorage } from 'src/tracks/store/tracks.storage';
+import { AlbumsStorage } from 'src/albums/store/albums.storage';
+import { ArtistsStorage } from 'src/artists/store/artists.storage';
 
 @Injectable()
 export class FavoritesService {
-  create(createFavoriteDto: CreateFavoriteDto) {
-    return 'This action adds a new favorite';
+  constructor(
+    private storage: FavoritesStorage,
+    private trackStorage: TracksStorage,
+    private albumStorage: AlbumsStorage,
+    private artistStorage: ArtistsStorage,
+  ) {}
+
+  addTrack(id: string) {
+    const track = this.trackStorage.getTrack(id);
+    if (track) {
+      this.storage.addTrack(id);
+      return 201;
+    } else return 422;
   }
 
+  addAlbum(id: string) {
+    const item = this.albumStorage.getAlbum(id);
+    if (item) {
+      this.storage.addAlbum(id);
+      return 201;
+    } else return 422;
+  }
+
+  addArtist(id: string) {
+    const item = this.artistStorage.getArtist(id);
+    if (item) {
+      this.storage.addArtist(id);
+      return 201;
+    } else return 422;
+  }
+
+  deleteTrack(id: string) {
+    return this.storage.deleteTrack(id);
+  }
+
+  deleteAlbum(id: string) {
+    return this.storage.deleteAlbum(id);
+  }
+
+  deleteArtist(id: string) {
+    return this.storage.deleteArtist(id);
+  }
   findAll() {
-    return `This action returns all favorites`;
-  }
-
-  findOne(id: number) {
-    return `This action returns a #${id} favorite`;
-  }
-
-  update(id: number, updateFavoriteDto: UpdateFavoriteDto) {
-    return `This action updates a #${id} favorite`;
-  }
-
-  remove(id: number) {
-    return `This action removes a #${id} favorite`;
+    return this.storage.get();
   }
 }

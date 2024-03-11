@@ -2,22 +2,82 @@ import {
   Controller,
   Get,
   Post,
-  Body,
-  Patch,
   Param,
   Delete,
+  HttpStatus,
+  Res,
 } from '@nestjs/common';
+import { Response } from 'express';
 import { FavoritesService } from './favorites.service';
-import { CreateFavoriteDto } from './dto/create-favorite.dto';
-import { UpdateFavoriteDto } from './dto/update-favorite.dto';
 
 @Controller('favs')
 export class FavoritesController {
-  constructor(private readonly favoritesService: FavoritesService) {}
+  constructor(private favoritesService: FavoritesService) {}
 
-  @Post()
-  create(@Body() createFavoriteDto: CreateFavoriteDto) {
-    return this.favoritesService.create(createFavoriteDto);
+  @Post('track/:id')
+  createTrack(@Param('id') id: string, @Res() res: Response) {
+    try {
+      if (id.length !== 36) {
+        return res
+          .status(HttpStatus.BAD_REQUEST)
+          .json({ error: 'Invalid Id format' });
+      } else {
+        const resp = this.favoritesService.addTrack(id);
+        if (resp === 201) return res.status(HttpStatus.OK).send('Track added');
+        return res
+          .status(HttpStatus.UNPROCESSABLE_ENTITY)
+          .json({ error: 'track does not exist' });
+      }
+    } catch (err) {
+      console.error('Error in create:', err);
+      return res
+        .status(HttpStatus.INTERNAL_SERVER_ERROR)
+        .json({ error: 'Internal Server Error' });
+    }
+  }
+
+  @Post('album/:id')
+  createAlbum(@Param('id') id: string, @Res() res: Response) {
+    try {
+      if (id.length !== 36) {
+        return res
+          .status(HttpStatus.BAD_REQUEST)
+          .json({ error: 'Invalid Id format' });
+      } else {
+        const resp = this.favoritesService.addAlbum(id);
+        if (resp === 201) return res.status(HttpStatus.OK).send('Album added');
+        return res
+          .status(HttpStatus.UNPROCESSABLE_ENTITY)
+          .json({ error: 'album does not exist' });
+      }
+    } catch (err) {
+      console.error('Error in create:', err);
+      return res
+        .status(HttpStatus.INTERNAL_SERVER_ERROR)
+        .json({ error: 'Internal Server Error' });
+    }
+  }
+
+  @Post('artist/:id')
+  createArtist(@Param('id') id: string, @Res() res: Response) {
+    try {
+      if (id.length !== 36) {
+        return res
+          .status(HttpStatus.BAD_REQUEST)
+          .json({ error: 'Invalid Id format' });
+      } else {
+        const resp = this.favoritesService.addArtist(id);
+        if (resp === 201) return res.status(HttpStatus.OK).send('Artist added');
+        return res
+          .status(HttpStatus.UNPROCESSABLE_ENTITY)
+          .json({ error: 'album does not exist' });
+      }
+    } catch (err) {
+      console.error('Error in create:', err);
+      return res
+        .status(HttpStatus.INTERNAL_SERVER_ERROR)
+        .json({ error: 'Internal Server Error' });
+    }
   }
 
   @Get()
@@ -25,21 +85,70 @@ export class FavoritesController {
     return this.favoritesService.findAll();
   }
 
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.favoritesService.findOne(+id);
+  @Delete('track/:id')
+  removeTrack(@Param('id') id: string, @Res() res: Response) {
+    try {
+      if (id.length !== 36) {
+        return res
+          .status(HttpStatus.BAD_REQUEST)
+          .json({ error: 'Invalid Id format' });
+      } else {
+        const resp = this.favoritesService.deleteTrack(id);
+        if (resp === 204)
+          return res.status(HttpStatus.NO_CONTENT).send('Track deleted');
+        return res
+          .status(HttpStatus.NOT_FOUND)
+          .json({ error: 'track not found' });
+      }
+    } catch (err) {
+      console.error('Error in create:', err);
+      return res
+        .status(HttpStatus.INTERNAL_SERVER_ERROR)
+        .json({ error: 'Internal Server Error' });
+    }
   }
-
-  @Patch(':id')
-  update(
-    @Param('id') id: string,
-    @Body() updateFavoriteDto: UpdateFavoriteDto,
-  ) {
-    return this.favoritesService.update(+id, updateFavoriteDto);
+  @Delete('album/:id')
+  removeAlbum(@Param('id') id: string, @Res() res: Response) {
+    try {
+      if (id.length !== 36) {
+        return res
+          .status(HttpStatus.BAD_REQUEST)
+          .json({ error: 'Invalid Id format' });
+      } else {
+        const resp = this.favoritesService.deleteAlbum(id);
+        if (resp === 204)
+          return res.status(HttpStatus.NO_CONTENT).send('Album deleted');
+        return res
+          .status(HttpStatus.NOT_FOUND)
+          .json({ error: 'album not found' });
+      }
+    } catch (err) {
+      console.error('Error in create:', err);
+      return res
+        .status(HttpStatus.INTERNAL_SERVER_ERROR)
+        .json({ error: 'Internal Server Error' });
+    }
   }
-
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.favoritesService.remove(+id);
+  @Delete('artist/:id')
+  removeArtist(@Param('id') id: string, @Res() res: Response) {
+    try {
+      if (id.length !== 36) {
+        return res
+          .status(HttpStatus.BAD_REQUEST)
+          .json({ error: 'Invalid Id format' });
+      } else {
+        const resp = this.favoritesService.deleteArtist(id);
+        if (resp === 204)
+          return res.status(HttpStatus.NO_CONTENT).send('Artist deleted');
+        return res
+          .status(HttpStatus.NOT_FOUND)
+          .json({ error: 'album not found' });
+      }
+    } catch (err) {
+      console.error('Error in create:', err);
+      return res
+        .status(HttpStatus.INTERNAL_SERVER_ERROR)
+        .json({ error: 'Internal Server Error' });
+    }
   }
 }
