@@ -1,10 +1,8 @@
 import { Injectable } from '@nestjs/common';
 import { IUserStorage } from '../interfaces/users-storage.interface';
 import { IUser } from '../interfaces/user.interface';
-
 import { CreateUserDto } from '../dto/create-user.dto';
 import { User } from '../entities/user.entity';
-//import { UpdateUserDto } from '../dto/update-user.dto';
 
 @Injectable()
 export class UsersStorage implements IUserStorage {
@@ -28,8 +26,7 @@ export class UsersStorage implements IUserStorage {
   }
 
   createUser(createUse: CreateUserDto): IUser {
-    const { login, password } = createUse;
-    const newUser = new User(login, password);
+    const newUser = new User(createUse);
 
     this.users.push(newUser);
     return newUser;
@@ -39,6 +36,8 @@ export class UsersStorage implements IUserStorage {
     const updatedUser = this.getUser(id);
 
     updatedUser.password = updatePass;
+    updatedUser.version = updatedUser.version + 1;
+    updatedUser.updatedAt = Date.now();
     return updatedUser;
   }
 

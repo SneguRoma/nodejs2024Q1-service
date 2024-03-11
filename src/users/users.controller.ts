@@ -13,6 +13,7 @@ import { Response } from 'express';
 import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
+import { userResponse } from './helpers/userRequest';
 
 @Controller('user')
 export class UsersController {
@@ -29,7 +30,7 @@ export class UsersController {
 
       return res
         .status(HttpStatus.CREATED)
-        .json(this.usersService.create(createUserDto));
+        .json(userResponse(this.usersService.create(createUserDto)));
     } catch (error) {
       console.error('Error in create:', error);
       return res
@@ -40,21 +41,21 @@ export class UsersController {
 
   @Get()
   findAll() {
-    return this.usersService.findAll();
+    return this.usersService.findAll().map((user) => userResponse(user));
   }
 
   @Get(':id')
   findOne(@Param('id') id: string, @Res() res: Response) {
-    //const isValidUUID = id.length === 6? true : false;
-    //const uuidRegex = /^[a-fA-F0-9]{6}$/;
-
     if (id.length !== 36) {
       return res
         .status(HttpStatus.BAD_REQUEST)
         .json({ error: 'Invalid userId format' });
     } else {
       const findedUser = this.usersService.findOne(id);
-      if (findedUser) return res.status(HttpStatus.OK).json(findedUser);
+      if (findedUser)
+        return res
+          .status(HttpStatus.OK)
+          .json(userResponse(this.usersService.findOne(id)));
       return res
         .status(HttpStatus.NOT_FOUND)
         .json({ error: 'user does not exist' });
@@ -73,13 +74,18 @@ export class UsersController {
           .status(HttpStatus.BAD_REQUEST)
           .json({ error: 'Invalid userId format' });
       }
-      const findedUser = this.usersService.findOne(id);
       const { oldPassword, newPassword } = updateUserDto;
+      if (!oldPassword || !newPassword) {
+        return res
+          .status(HttpStatus.BAD_REQUEST)
+          .json({ error: 'Invalid DTO format' });
+      }
+      const findedUser = this.usersService.findOne(id);
       if (findedUser) {
         if (findedUser.password === oldPassword) {
           return res
             .status(HttpStatus.OK)
-            .json(this.usersService.update(id, newPassword));
+            .json(userResponse(this.usersService.update(id, newPassword)));
         } else {
           return res
             .status(HttpStatus.FORBIDDEN)
