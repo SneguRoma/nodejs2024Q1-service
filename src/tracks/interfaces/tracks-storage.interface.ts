@@ -8,5 +8,7 @@ export interface ITrackStorage {
   createTrack(createTrack: CreateTrackDto): ITrack;
   updateTrack(updateTrackDto: UpdateTrackDto, id: string): ITrack;
   deleteTrack(id: string): void;
+  deleteArtist(id: string): void;
+  deleteAlbums(id: string): void;
   tracks: ITrack[];
 }

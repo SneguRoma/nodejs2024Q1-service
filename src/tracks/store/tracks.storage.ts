@@ -5,18 +5,11 @@ import { ITrack } from '../interfaces/track.interface';
 import { Track } from '../entities/track.entity';
 import { CreateTrackDto } from '../dto/create-track.dto';
 import { UpdateTrackDto } from '../dto/update-track.dto';
+import { tracksStore } from './tracks';
 
 @Injectable()
 export class TracksStorage implements ITrackStorage {
-  tracks: ITrack[] = [
-    {
-      id: '4205d419-a068-4115-9462-c64e78ad247c',
-      name: 'string',
-      artistId: null, // refers to Artist
-      albumId: null, // refers to Album
-      duration: 2,
-    },
-  ];
+  tracks: ITrack[] = tracksStore;
 
   get(): ITrack[] {
     return this.tracks;
@@ -48,5 +41,29 @@ export class TracksStorage implements ITrackStorage {
       (track: { id: string }) => track.id !== id,
     );
     this.tracks = newTracks;
+  }
+
+  deleteArtist(id: string): void {
+    const newTracks = this.tracks.map((track) => {
+      if (track.artistId === id) {
+        track.artistId = null;
+      } else {
+        track.artistId = track.artistId;
+      }
+      return track;
+    });
+    this.tracks = newTracks;
+  }
+
+  deleteAlbums(id: string): void {
+    const newItems = this.tracks.map((track) => {
+      if (track.albumId === id) {
+        track.albumId = null;
+      } else {
+        track.albumId = track.albumId;
+      }
+      return track;
+    });
+    this.tracks = newItems;
   }
 }

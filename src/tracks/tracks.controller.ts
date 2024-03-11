@@ -13,8 +13,6 @@ import { Response } from 'express';
 import { TracksService } from './tracks.service';
 import { CreateTrackDto } from './dto/create-track.dto';
 import { UpdateTrackDto } from './dto/update-track.dto';
-//import { Track } from './entities/track.entity';
-//import { UpdateTrackDto } from './dto/update-track.dto';
 
 @Controller('track')
 export class TracksController {
@@ -52,8 +50,8 @@ export class TracksController {
         .status(HttpStatus.BAD_REQUEST)
         .json({ error: 'Invalid trackId format' });
     } else {
-      const findedUser = this.tracksService.findOne(id);
-      if (findedUser)
+      const findedTrack = this.tracksService.findOne(id);
+      if (findedTrack)
         return res.status(HttpStatus.OK).json(this.tracksService.findOne(id));
       return res
         .status(HttpStatus.NOT_FOUND)
@@ -79,8 +77,8 @@ export class TracksController {
           .status(HttpStatus.BAD_REQUEST)
           .json({ error: 'Invalid DTO format' });
       }
-      const findedUser = this.tracksService.findOne(id);
-      if (findedUser) {
+      const findedTrack = this.tracksService.findOne(id);
+      if (findedTrack) {
         return res
           .status(HttpStatus.OK)
           .json(this.tracksService.update(id, updateTrackDto));
@@ -103,9 +101,9 @@ export class TracksController {
         .status(HttpStatus.BAD_REQUEST)
         .json({ error: 'Invalid trackId format' });
     } else {
-      const findedUser = this.tracksService.findOne(id);
+      const findedTrack = this.tracksService.findOne(id);
 
-      if (findedUser) {
+      if (findedTrack) {
         return res
           .status(HttpStatus.NO_CONTENT)
           .send(this.tracksService.remove(id));

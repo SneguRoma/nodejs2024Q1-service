@@ -1,26 +1,34 @@
 import { Injectable } from '@nestjs/common';
 import { CreateAlbumDto } from './dto/create-album.dto';
 import { UpdateAlbumDto } from './dto/update-album.dto';
+import { AlbumsStorage } from './store/albums.storage';
+import { TracksStorage } from 'src/tracks/store/tracks.storage';
 
 @Injectable()
 export class AlbumsService {
+  constructor(
+    private storage: AlbumsStorage,
+    private trackStorage: TracksStorage,
+  ) {}
+
   create(createAlbumDto: CreateAlbumDto) {
-    return 'This action adds a new album';
+    return this.storage.createAlbum(createAlbumDto);
   }
 
   findAll() {
-    return `This action returns all albums`;
+    return this.storage.get();
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} album`;
+  findOne(id: string) {
+    return this.storage.getAlbum(id);
   }
 
-  update(id: number, updateAlbumDto: UpdateAlbumDto) {
-    return `This action updates a #${id} album`;
+  update(id: string, updateAlbumDto: UpdateAlbumDto) {
+    return this.storage.updateAlbum(updateAlbumDto, id);
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} album`;
+  remove(id: string) {
+    this.trackStorage.deleteArtist(id);
+    this.storage.deleteAlbum(id);
   }
 }
