@@ -1,0 +1,44 @@
+version: '3'
+networks:
+  default:
+    driver: bridge
+
+services:
+  nest:
+    build: 
+      dockerfile: Dockerfile
+      context: .
+    restart: always
+    env_file:
+      - .env
+    ports:
+      - ${PORT}:${PORT}
+    depends_on:
+      - postgres
+    volumes:
+      - ./src:/app/src
+    networks:
+      - default
+
+  postgres:
+    build: ./src/db
+    restart: always
+    env_file:
+      - .env
+    ports:
+      - ${POSTGRES_PORT}:${POSTGRES_PORT}
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
+    networks:
+      - default
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - postgres_logs:/logs
+    command: postgres -c logging_collector=on -c log_destination=stderr -c log_directory=/logs
+
+
+volumes:
+  postgres_data:
+  postgres_logs:
