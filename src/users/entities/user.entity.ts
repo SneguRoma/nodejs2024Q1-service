@@ -1,19 +1,27 @@
-import { Exclude } from 'class-transformer';
-import { IUser } from '../interfaces/user.interface';
-import { v4 as uuidv4 } from 'uuid';
+import { Entity, PrimaryGeneratedColumn, Column } from 'typeorm';
 
-export class User implements IUser {
+@Entity({ name: 'users' })
+export class User {
+  @PrimaryGeneratedColumn('uuid')
   id: string;
+
+  @Column()
   version: number;
+
+  @Column()
   createdAt: number;
+
+  @Column()
   updatedAt: number;
+
+  @Column()
   login: string;
 
-  @Exclude()
+  @Column()
   password: string;
 
   constructor(partial: Partial<User>) {
-    this.id = uuidv4();
+    this.id = 'uuidv4()';
     Object.assign(this, partial);
     this.version = 1;
     this.createdAt = Date.now(); // timestamp of creation
