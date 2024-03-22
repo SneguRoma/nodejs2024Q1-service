@@ -1,5 +1,5 @@
 # Start your image with a node base image
-FROM node:18-alpine
+FROM node:21-alpine
 
 # The /app directory should act as the main application directory
 WORKDIR /app
@@ -7,12 +7,15 @@ WORKDIR /app
 # Copy the app package and package-lock.json file
 COPY package*.json ./
 
+# Install node packages
+RUN npm install && npm cache clean --force 
+
+RUN npm install --save @nestjs/config @nestjs/typeorm typeorm
+
 # Copy local directories to the current local directory of our docker image (/app)
 COPY . .
 
 
-# Install node packages
-RUN npm install 
 
 EXPOSE 4000
 
