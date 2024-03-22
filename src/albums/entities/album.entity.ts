@@ -1,11 +1,28 @@
 import { v4 as uuidv4 } from 'uuid';
-import { IAlbum } from '../interfaces/album.interface';
 
-export class Album implements IAlbum {
+import {
+  Column,
+  Entity,
+  JoinColumn,
+  ManyToOne,
+  PrimaryGeneratedColumn,
+} from 'typeorm';
+import { Artist } from 'src/artists/entities/artist.entity';
+
+@Entity({ name: 'albums' })
+export class Album {
+  @PrimaryGeneratedColumn('uuid', { name: 'albumId' })
   id: string;
+
+  @Column()
   name: string;
+
+  @Column()
   year: number;
-  artistId: string;
+
+  @ManyToOne(() => Artist, (artist) => artist.albums, { onDelete: 'SET NULL' })
+  @JoinColumn({ name: 'artistId' })
+  artistId: Artist;
 
   constructor(partial: Partial<Album>) {
     this.id = uuidv4();

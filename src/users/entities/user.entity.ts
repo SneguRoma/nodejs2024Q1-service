@@ -1,23 +1,29 @@
-import { Entity, PrimaryGeneratedColumn, Column } from 'typeorm';
+import {
+  Entity,
+  PrimaryGeneratedColumn,
+  Column,
+  CreateDateColumn,
+  UpdateDateColumn,
+} from 'typeorm';
 
 @Entity({ name: 'users' })
 export class User {
-  @PrimaryGeneratedColumn('uuid')
+  @PrimaryGeneratedColumn('uuid', { name: 'user_id' })
   id: string;
 
   @Column()
   version: number;
 
-  @Column()
+  @CreateDateColumn({ type: 'timestamp' })
   createdAt: number;
 
-  @Column()
+  @UpdateDateColumn({ type: 'timestamp' })
   updatedAt: number;
 
   @Column()
   login: string;
 
-  @Column()
+  @Column({ select: false })
   password: string;
 
   constructor(partial: Partial<User>) {
