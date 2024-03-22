@@ -5,9 +5,11 @@ import {
   Entity,
   JoinColumn,
   ManyToOne,
+  OneToMany,
   PrimaryGeneratedColumn,
 } from 'typeorm';
 import { Artist } from 'src/artists/entities/artist.entity';
+import { Track } from 'src/tracks/entities/track.entity';
 
 @Entity({ name: 'albums' })
 export class Album {
@@ -22,7 +24,10 @@ export class Album {
 
   @ManyToOne(() => Artist, (artist) => artist.albums, { onDelete: 'SET NULL' })
   @JoinColumn({ name: 'artistId' })
-  artistId: Artist;
+  artistId: Artist | string;
+
+  @OneToMany(() => Track, (track) => track.albumId, { eager: false })
+  tracks: Track[];
 
   constructor(partial: Partial<Album>) {
     this.id = uuidv4();
