@@ -6,120 +6,98 @@ import {
   Param,
   Delete,
   HttpStatus,
-  Res,
   Put,
+  UsePipes,
+  ValidationPipe,
+  HttpException,
+  HttpCode,
 } from '@nestjs/common';
-import { Response } from 'express';
 import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { userResponse } from './helpers/userRequest';
+import { validate } from 'uuid';
 
 @Controller('user')
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
   @Post()
-  create(@Body() createUserDto: CreateUserDto, @Res() res: Response) {
-    try {
-      if (!createUserDto.login || !createUserDto.password) {
-        return res
-          .status(HttpStatus.BAD_REQUEST)
-          .json({ error: 'Login and password are required' });
-      }
-
-      return res
-        .status(HttpStatus.CREATED)
-        .json(userResponse(this.usersService.create(createUserDto)));
-    } catch (error) {
-      console.error('Error in create:', error);
-      return res
-        .status(HttpStatus.INTERNAL_SERVER_ERROR)
-        .json({ error: 'Internal Server Error' });
-    }
+  @UsePipes(new ValidationPipe())
+  create(@Body() createUserDto: CreateUserDto) {
+    return this.usersService.create(createUserDto);
   }
 
   @Get()
   findAll() {
-    return this.usersService.findAll().map((user) => userResponse(user));
+    return this.usersService.findAll();
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string, @Res() res: Response) {
-    if (id.length !== 36) {
-      return res
-        .status(HttpStatus.BAD_REQUEST)
-        .json({ error: 'Invalid userId format' });
+  async findOne(@Param('id') id: string) {
+    const isValidUUID = validate(id);
+    if (!isValidUUID) {
+      throw new HttpException(
+        `The provided ID (${id}) is not a valid UUID`,
+        HttpStatus.BAD_REQUEST,
+      );
     } else {
-      const findedUser = this.usersService.findOne(id);
-      if (findedUser)
-        return res
-          .status(HttpStatus.OK)
-          .json(userResponse(this.usersService.findOne(id)));
-      return res
-        .status(HttpStatus.NOT_FOUND)
-        .json({ error: 'user does not exist' });
+      const findedUser = await this.usersService.findOne(id);
+      if (findedUser === '') {
+        throw new HttpException(`user not found`, HttpStatus.NOT_FOUND);
+      }
+      return userResponse(findedUser);
     }
   }
 
   @Put(':id')
-  update(
-    @Param('id') id: string,
-    @Body() updateUserDto: UpdateUserDto,
-    @Res() res: Response,
-  ) {
-    try {
-      if (id.length !== 36) {
-        return res
-          .status(HttpStatus.BAD_REQUEST)
-          .json({ error: 'Invalid userId format' });
+  async update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
+    const isValidUUID = validate(id);
+
+    if (!isValidUUID) {
+      throw new HttpException(
+        `The provided ID (${id}) is not a valid UUID`,
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+    const { oldPassword, newPassword } = updateUserDto;
+
+    const findedUser = await this.usersService.findOne(id);
+
+    if (findedUser === '') {
+      throw new HttpException(`user not found`, HttpStatus.NOT_FOUND);
+    }
+
+    if (findedUser) {
+      if (findedUser.password === oldPassword) {
+        const user = await this.usersService.update(findedUser, newPassword);
+        return user;
+      } else {
+        throw new HttpException(`Wrong password`, HttpStatus.FORBIDDEN);
       }
-      const { oldPassword, newPassword } = updateUserDto;
-      if (!oldPassword || !newPassword) {
-        return res
-          .status(HttpStatus.BAD_REQUEST)
-          .json({ error: 'Invalid DTO format' });
-      }
-      const findedUser = this.usersService.findOne(id);
-      if (findedUser) {
-        if (findedUser.password === oldPassword) {
-          return res
-            .status(HttpStatus.OK)
-            .json(userResponse(this.usersService.update(id, newPassword)));
-        } else {
-          return res
-            .status(HttpStatus.FORBIDDEN)
-            .json({ error: 'incorrect password' });
-        }
-      }
-      return res
-        .status(HttpStatus.NOT_FOUND)
-        .json({ error: 'user does not exist' });
-    } catch (error) {
-      console.error('Error in create:', error);
-      return res
-        .status(HttpStatus.INTERNAL_SERVER_ERROR)
-        .json({ error: 'Internal Server Error' });
     }
   }
 
+  @HttpCode(HttpStatus.NO_CONTENT)
   @Delete(':id')
-  remove(@Param('id') id: string, @Res() res: Response) {
-    if (id.length !== 36) {
-      return res
-        .status(HttpStatus.BAD_REQUEST)
-        .json({ error: 'Invalid userId format' });
+  async remove(@Param('id') id: string) {
+    const isValidUUID = validate(id);
+
+    if (!isValidUUID) {
+      throw new HttpException(
+        `The provided ID (${id}) is not a valid UUID`,
+        HttpStatus.BAD_REQUEST,
+      );
     } else {
-      const findedUser = this.usersService.findOne(id);
+      const findedUser = await this.usersService.findOne(id);
+
+      if (findedUser === '') {
+        throw new HttpException(`user not found`, HttpStatus.NOT_FOUND);
+      }
 
       if (findedUser) {
-        return res
-          .status(HttpStatus.NO_CONTENT)
-          .send(this.usersService.remove(id));
+        return this.usersService.remove(id);
       }
-      return res
-        .status(HttpStatus.NOT_FOUND)
-        .json({ error: 'user does not exist' });
     }
   }
 }

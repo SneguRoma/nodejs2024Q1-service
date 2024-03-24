@@ -1,29 +1,40 @@
 import { Injectable } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
-//import { UpdateUserDto } from './dto/update-user.dto';
-import { UsersStorage } from './store/users.storage';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
+import { User } from './entities/user.entity';
+import { userResponse } from './helpers/userRequest';
 
 @Injectable()
 export class UsersService {
-  constructor(private storage: UsersStorage) {}
+  constructor(@InjectRepository(User) private storage: Repository<User>) {}
 
-  create(createUserDto: CreateUserDto) {
-    return this.storage.createUser(createUserDto);
+  async create(createUserDto: CreateUserDto) {
+    const newUser = await this.storage.save(new User(createUserDto));
+    const responceUser = userResponse(newUser);
+    return responceUser;
   }
 
-  findAll() {
-    return this.storage.get();
+  async findAll() {
+    return (await this.storage.find()).map((user) => userResponse(user));
   }
 
-  findOne(id: string) {
-    return this.storage.getUser(id);
+  async findOne(id: string) {
+    const user = await this.storage.findOneBy({ id });
+    if (!user) {
+      return '';
+    }
+    return user;
   }
 
-  update(id: string, newPass: string) {
-    return this.storage.updateUser(newPass, id);
+  async update(updatedUser: User, newPass: string) {
+    updatedUser.version += 1;
+    updatedUser.password = newPass;
+    const newUser = await this.storage.save(updatedUser);
+    return userResponse(newUser);
   }
 
-  remove(id: string) {
-    this.storage.deleteUser(id);
+  async remove(id: string) {
+    return await this.storage.delete(id);
   }
 }

@@ -10,6 +10,9 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 //import { join } from 'path';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { User } from './users/entities/user.entity';
+import { Album } from './albums/entities/album.entity';
+import { Artist } from './artists/entities/artist.entity';
+import { Track } from './tracks/entities/track.entity';
 
 @Module({
   imports: [
@@ -30,7 +33,7 @@ import { User } from './users/entities/user.entity';
         password: configService.get('POSTGRES_PASSWORD'),
         database: configService.get('POSTGRES_DB'),
         synchronize: true,
-        entities: [User], //[join(process.cwd()), '/**/user.entity{.js,.ts}'],
+        entities: [User, Album, Artist, Track], //[join(process.cwd()), '/**/user.entity{.js,.ts}'],
       }),
     }),
   ],

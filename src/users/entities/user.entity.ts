@@ -14,23 +14,25 @@ export class User {
   @Column()
   version: number;
 
-  @CreateDateColumn({ type: 'timestamp' })
+  @CreateDateColumn({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
   createdAt: number;
 
-  @UpdateDateColumn({ type: 'timestamp' })
+  @UpdateDateColumn({
+    type: 'timestamp',
+    default: () => 'CURRENT_TIMESTAMP',
+    onUpdate: 'CURRENT_TIMESTAMP',
+  })
   updatedAt: number;
 
   @Column()
   login: string;
 
-  @Column({ select: false })
+  @Column()
   password: string;
 
   constructor(partial: Partial<User>) {
-    this.id = 'uuidv4()';
     Object.assign(this, partial);
     this.version = 1;
-    this.createdAt = Date.now(); // timestamp of creation
-    this.updatedAt = Date.now(); // timestamp of last update
+    // timestamp of last update
   }
 }
