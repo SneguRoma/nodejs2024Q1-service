@@ -18,14 +18,14 @@ npm install
 ```
 
 ## Running application
-
+```
 Create .env file based on .env.example 
-
+```
 
 Run next command in your terminal, for building images and docker containers up:
-
+```
 docker-compose up -d
-
+```
 Run without docker
 
 ```
