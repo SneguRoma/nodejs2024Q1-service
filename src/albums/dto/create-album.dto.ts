@@ -1,5 +1,4 @@
 import { IsString, IsNotEmpty, IsNumber } from 'class-validator';
-//import { Artist } from 'src/artists/entities/artist.entity';
 
 export class CreateAlbumDto {
   @IsString()

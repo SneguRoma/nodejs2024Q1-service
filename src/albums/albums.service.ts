@@ -11,7 +11,7 @@ export class AlbumsService {
 
   async create(createAlbumDto: CreateAlbumDto) {
     const newAlbum = await this.storage.save(new Album(createAlbumDto));
-    return this.storage.save(newAlbum);
+    return newAlbum;
   }
 
   async findAll() {
@@ -30,7 +30,7 @@ export class AlbumsService {
     updatedAlbum.artistId = updateAlbumDto.artistId;
     updatedAlbum.year = updateAlbumDto.year;
     updatedAlbum.name = updateAlbumDto.name;
-    return this.storage.save(updatedAlbum);
+    return await this.storage.save(updatedAlbum);
   }
 
   async remove(id: string) {

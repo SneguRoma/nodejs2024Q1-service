@@ -1,5 +1,3 @@
-import { v4 as uuidv4 } from 'uuid';
-
 import { Entity, PrimaryGeneratedColumn, Column, OneToMany } from 'typeorm';
 import { Album } from 'src/albums/entities/album.entity';
 
@@ -14,11 +12,10 @@ export class Artist {
   @Column()
   grammy: boolean;
 
-  @OneToMany(() => Album, (album) => album.artistId)
+  @OneToMany(() => Album, (album) => album.artist)
   albums: Album[];
 
   constructor(partial: Partial<Artist>) {
-    this.id = uuidv4();
     Object.assign(this, partial);
   }
 }
