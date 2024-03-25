@@ -33,6 +33,5 @@ export class User {
   constructor(partial: Partial<User>) {
     Object.assign(this, partial);
     this.version = 1;
-    // timestamp of last update
   }
 }

@@ -1,5 +1,3 @@
-import { v4 as uuidv4 } from 'uuid';
-
 import {
   Column,
   Entity,
@@ -22,15 +20,17 @@ export class Album {
   @Column()
   year: number;
 
+  @Column({ nullable: true })
+  artistId: string | null;
+
   @ManyToOne(() => Artist, (artist) => artist.albums, { onDelete: 'SET NULL' })
   @JoinColumn({ name: 'artistId' })
-  artistId: Artist | string;
+  artist: Artist | string;
 
   @OneToMany(() => Track, (track) => track.albumId, { eager: false })
   tracks: Track[];
 
   constructor(partial: Partial<Album>) {
-    this.id = uuidv4();
     Object.assign(this, partial);
   }
 }

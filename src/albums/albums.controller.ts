@@ -5,37 +5,26 @@ import {
   Body,
   Param,
   Delete,
-  Res,
   HttpStatus,
   Put,
+  UsePipes,
+  ValidationPipe,
+  HttpException,
+  HttpCode,
 } from '@nestjs/common';
-import { Response } from 'express';
 import { AlbumsService } from './albums.service';
 import { CreateAlbumDto } from './dto/create-album.dto';
 import { UpdateAlbumDto } from './dto/update-album.dto';
+import { validate } from 'uuid';
 
 @Controller('album')
 export class AlbumsController {
   constructor(private readonly albumsService: AlbumsService) {}
 
   @Post()
-  create(@Body() createAlbumDto: CreateAlbumDto, @Res() res: Response) {
-    try {
-      if (!createAlbumDto.name || !createAlbumDto.year) {
-        return res
-          .status(HttpStatus.BAD_REQUEST)
-          .json({ error: 'name and year are required' });
-      }
-
-      return res
-        .status(HttpStatus.CREATED)
-        .json(this.albumsService.create(createAlbumDto));
-    } catch (error) {
-      console.error('Error in create:', error);
-      return res
-        .status(HttpStatus.INTERNAL_SERVER_ERROR)
-        .json({ error: 'Internal Server Error' });
-    }
+  @UsePipes(new ValidationPipe())
+  create(@Body() createAlbumDto: CreateAlbumDto) {
+    return this.albumsService.create(createAlbumDto);
   }
 
   @Get()
@@ -44,73 +33,71 @@ export class AlbumsController {
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string, @Res() res: Response) {
-    if (id.length !== 36) {
-      return res
-        .status(HttpStatus.BAD_REQUEST)
-        .json({ error: 'Invalid Id format' });
+  async findOne(@Param('id') id: string) {
+    const isValidUUID = validate(id);
+    if (!isValidUUID) {
+      throw new HttpException(
+        `The provided ID (${id}) is not a valid UUID`,
+        HttpStatus.BAD_REQUEST,
+      );
     } else {
-      const findedItem = this.albumsService.findOne(id);
-      if (findedItem)
-        return res.status(HttpStatus.OK).json(this.albumsService.findOne(id));
-      return res
-        .status(HttpStatus.NOT_FOUND)
-        .json({ error: 'album does not exist' });
+      const findedAlbum = await this.albumsService.findOne(id);
+      if (findedAlbum === '') {
+        throw new HttpException(`album not found`, HttpStatus.NOT_FOUND);
+      }
+      return findedAlbum;
     }
   }
 
   @Put(':id')
-  update(
+  async update(
     @Param('id') id: string,
     @Body() updateAlbumDto: UpdateAlbumDto,
-    @Res() res: Response,
   ) {
-    try {
-      if (id.length !== 36) {
-        return res
-          .status(HttpStatus.BAD_REQUEST)
-          .json({ error: 'Invalid Id format' });
-      }
-      const { name, year } = updateAlbumDto;
-      if (!name || !year) {
-        return res
-          .status(HttpStatus.BAD_REQUEST)
-          .json({ error: 'Invalid DTO format' });
-      }
-      const findedItem = this.albumsService.findOne(id);
-      if (findedItem) {
-        return res
-          .status(HttpStatus.OK)
-          .json(this.albumsService.update(id, updateAlbumDto));
-      }
-      return res
-        .status(HttpStatus.NOT_FOUND)
-        .json({ error: 'album does not exist' });
-    } catch (error) {
-      console.error('Error in create:', error);
-      return res
-        .status(HttpStatus.INTERNAL_SERVER_ERROR)
-        .json({ error: 'Internal Server Error' });
+    const isValidUUID = validate(id);
+
+    if (!isValidUUID) {
+      throw new HttpException(
+        `The provided ID (${id}) is not a valid UUID`,
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+
+    const findedAlbum = await this.albumsService.findOne(id);
+
+    if (findedAlbum === '') {
+      throw new HttpException(`album not found`, HttpStatus.NOT_FOUND);
+    }
+
+    if (findedAlbum) {
+      const album = await this.albumsService.update(
+        findedAlbum,
+        updateAlbumDto,
+      );
+      return album;
     }
   }
 
+  @HttpCode(HttpStatus.NO_CONTENT)
   @Delete(':id')
-  remove(@Param('id') id: string, @Res() res: Response) {
-    if (id.length !== 36) {
-      return res
-        .status(HttpStatus.BAD_REQUEST)
-        .json({ error: 'Invalid Id format' });
-    } else {
-      const findedItem = this.albumsService.findOne(id);
+  async remove(@Param('id') id: string) {
+    const isValidUUID = validate(id);
 
-      if (findedItem) {
-        return res
-          .status(HttpStatus.NO_CONTENT)
-          .send(this.albumsService.remove(id));
+    if (!isValidUUID) {
+      throw new HttpException(
+        `The provided ID (${id}) is not a valid UUID`,
+        HttpStatus.BAD_REQUEST,
+      );
+    } else {
+      const findedAlbum = await this.albumsService.findOne(id);
+
+      if (findedAlbum === '') {
+        throw new HttpException(`album not found`, HttpStatus.NOT_FOUND);
       }
-      return res
-        .status(HttpStatus.NOT_FOUND)
-        .json({ error: 'album does not exist' });
+
+      if (findedAlbum) {
+        return this.albumsService.remove(id);
+      }
     }
   }
 }
