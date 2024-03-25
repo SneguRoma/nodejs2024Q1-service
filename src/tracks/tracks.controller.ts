@@ -16,6 +16,7 @@ import { TracksService } from './tracks.service';
 import { CreateTrackDto } from './dto/create-track.dto';
 import { UpdateTrackDto } from './dto/update-track.dto';
 import { validate } from 'uuid';
+import { trackResponse } from './helpers/trackRequest';
 
 @Controller('track')
 export class TracksController {
@@ -45,7 +46,7 @@ export class TracksController {
       if (findedTrack === '') {
         throw new HttpException(`track not found`, HttpStatus.NOT_FOUND);
       }
-      return findedTrack;
+      return trackResponse(findedTrack);
     }
   }
 

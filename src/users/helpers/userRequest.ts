@@ -5,7 +5,7 @@ export const userResponse = (newUser: User) => {
     id: newUser.id,
     login: newUser.login,
     version: newUser.version,
-    createdAt: newUser.createdAt,
-    updatedAt: newUser.updatedAt,
+    createdAt: new Date(newUser.createdAt).getTime(),
+    updatedAt: new Date(newUser.updatedAt).getTime(),
   };
 };

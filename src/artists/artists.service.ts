@@ -4,6 +4,7 @@ import { UpdateArtistDto } from './dto/update-artist.dto';
 import { Artist } from './entities/artist.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
+import { artistResponse } from './helpers/artistRequest';
 
 @Injectable()
 export class ArtistsService {
@@ -11,11 +12,11 @@ export class ArtistsService {
 
   async create(createArtistDto: CreateArtistDto) {
     const newArtist = await this.storage.save(new Artist(createArtistDto));
-    return newArtist;
+    return artistResponse(newArtist);
   }
 
   async findAll() {
-    return await this.storage.find();
+    return (await this.storage.find()).map((item) => artistResponse(item));
   }
 
   async findOne(id: string) {
@@ -29,7 +30,8 @@ export class ArtistsService {
   async update(updatedArtist: Artist, updateArtistDto: UpdateArtistDto) {
     updatedArtist.name = updateArtistDto.name;
     updatedArtist.grammy = updateArtistDto.grammy;
-    return await this.storage.save(updatedArtist);
+    const response = await this.storage.save(updatedArtist);
+    return artistResponse(response);
   }
 
   async remove(id: string) {

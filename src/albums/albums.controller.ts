@@ -16,6 +16,7 @@ import { AlbumsService } from './albums.service';
 import { CreateAlbumDto } from './dto/create-album.dto';
 import { UpdateAlbumDto } from './dto/update-album.dto';
 import { validate } from 'uuid';
+import { albumResponse } from './helpers/albumRequest';
 
 @Controller('album')
 export class AlbumsController {
@@ -45,7 +46,7 @@ export class AlbumsController {
       if (findedAlbum === '') {
         throw new HttpException(`album not found`, HttpStatus.NOT_FOUND);
       }
-      return findedAlbum;
+      return albumResponse(findedAlbum);
     }
   }
 

@@ -6,13 +6,14 @@ import { ArtistsModule } from './artists/artists.module';
 import { AlbumsModule } from './albums/albums.module';
 import { TracksModule } from './tracks/tracks.module';
 import { FavoritesModule } from './favorites/favorites.module';
-import { ConfigModule, ConfigService } from '@nestjs/config';
+//import { ConfigModule, ConfigService } from '@nestjs/config';
 //import { join } from 'path';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { User } from './users/entities/user.entity';
+/* import { User } from './users/entities/user.entity';
 import { Album } from './albums/entities/album.entity';
 import { Artist } from './artists/entities/artist.entity';
-import { Track } from './tracks/entities/track.entity';
+import { Track } from './tracks/entities/track.entity'; */
+import { dataSourceOptions } from './data';
 
 @Module({
   imports: [
@@ -21,17 +22,8 @@ import { Track } from './tracks/entities/track.entity';
     AlbumsModule,
     TracksModule,
     FavoritesModule,
-    /* TypeOrmModule.forRoot({
-      type: 'postgres',
-      host: process.env.POSTGRES_HOST || 'postgres',
-      port: parseInt(process.env.POSTGRES_PORT || '5432'),
-      username: process.env.POSTGRES_USERNAME || 'postgres',
-      password: process.env.POSTGRES_PASSWORD || '123456',
-      database: process.env.POSTGRES_DB || 'postgres',
-      synchronize: true,
-      entities: [User, Album, Track, Artist],
-    }), */
-    ConfigModule.forRoot({ isGlobal: true }),
+    TypeOrmModule.forRoot(dataSourceOptions),
+    /*  ConfigModule.forRoot({ isGlobal: true }),
     TypeOrmModule.forRootAsync({
       imports: [ConfigModule],
       inject: [ConfigService],
@@ -45,7 +37,7 @@ import { Track } from './tracks/entities/track.entity';
         synchronize: true,
         entities: [User, Album, Artist, Track],
       }),
-    }),
+    }), */
   ],
   controllers: [AppController],
   providers: [AppService],

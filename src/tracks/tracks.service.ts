@@ -4,6 +4,7 @@ import { UpdateTrackDto } from './dto/update-track.dto';
 import { Track } from './entities/track.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
+import { trackResponse } from './helpers/trackRequest';
 
 @Injectable()
 export class TracksService {
@@ -11,11 +12,11 @@ export class TracksService {
 
   async create(createTrackDto: CreateTrackDto) {
     const newTrack = await this.storage.save(new Track(createTrackDto));
-    return newTrack;
+    return trackResponse(newTrack);
   }
 
   async findAll() {
-    return await this.storage.find();
+    return (await this.storage.find()).map((item) => trackResponse(item));
   }
 
   async findOne(id: string) {
@@ -31,7 +32,8 @@ export class TracksService {
     updatedTrack.artistId = updateTrackDto.artistId;
     updatedTrack.albumId = updateTrackDto.albumId;
     updatedTrack.duration = updateTrackDto.duration;
-    return await this.storage.save(updatedTrack);
+    const response = await this.storage.save(updatedTrack);
+    return trackResponse(response);
   }
 
   async remove(id: string) {

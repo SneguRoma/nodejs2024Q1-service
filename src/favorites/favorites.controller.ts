@@ -81,6 +81,7 @@ export class FavoritesController {
   @HttpCode(HttpStatus.NO_CONTENT)
   async deleteTrack(@Param('id') id: string) {
     const isValidUUID = validate(id);
+
     if (!isValidUUID) {
       throw new HttpException(
         `The provided ID (${id}) is not a valid UUID`,
@@ -88,6 +89,7 @@ export class FavoritesController {
       );
     } else {
       const resp = await this.favoritesService.deleteTrack(id);
+
       if (resp === '') {
         throw new HttpException(`track not found`, HttpStatus.NOT_FOUND);
       }

@@ -18,6 +18,7 @@ import { CreateArtistDto } from './dto/create-artist.dto';
 import { UpdateArtistDto } from './dto/update-artist.dto';
 
 import { validate } from 'uuid';
+import { artistResponse } from './helpers/artistRequest';
 
 @Controller('artist')
 export class ArtistsController {
@@ -47,7 +48,7 @@ export class ArtistsController {
       if (findedArtist === '') {
         throw new HttpException(`artist not found`, HttpStatus.NOT_FOUND);
       }
-      return findedArtist;
+      return artistResponse(findedArtist);
     }
   }
 

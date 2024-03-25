@@ -19,7 +19,7 @@ export class Artist {
   @OneToMany(() => Track, (track) => track.artist)
   tracks: Track[];
 
-  @Column({ select: false, default: false })
+  @Column({ default: false })
   isFavorite: boolean;
 
   constructor(partial: Partial<Artist>) {

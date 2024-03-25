@@ -2,8 +2,11 @@ import { Injectable } from '@nestjs/common';
 
 import { InjectRepository } from '@nestjs/typeorm';
 import { Album } from 'src/albums/entities/album.entity';
+import { albumResponse } from 'src/albums/helpers/albumRequest';
 import { Artist } from 'src/artists/entities/artist.entity';
+import { artistResponse } from 'src/artists/helpers/artistRequest';
 import { Track } from 'src/tracks/entities/track.entity';
+import { trackResponse } from 'src/tracks/helpers/trackRequest';
 import { Repository } from 'typeorm';
 
 @Injectable()
@@ -18,14 +21,6 @@ export class FavoritesService {
     @InjectRepository(Artist)
     private artistStorage: Repository<Artist>,
   ) {}
-
-  /* async findOneTrack(id: string) {
-    const item = await this.trackStorage.findOneBy({ id });
-    if (!item) {
-      return '';
-    }
-    return item;
-  } */
 
   async findAll() {
     const favArtists = await this.artistStorage.find({
@@ -44,9 +39,9 @@ export class FavoritesService {
       },
     });
     return {
-      artists: favArtists,
-      albums: favAlbums,
-      tracks: favTracks,
+      artists: favArtists.map((item) => artistResponse(item)),
+      albums: favAlbums.map((item) => albumResponse(item)),
+      tracks: favTracks.map((item) => trackResponse(item)),
     };
   }
 
@@ -55,7 +50,8 @@ export class FavoritesService {
 
     if (track) {
       track.isFavorite = true;
-      return this.trackStorage.save(track);
+      const result = await this.trackStorage.save(track);
+      return trackResponse(result);
     } else return '';
   }
 
@@ -64,7 +60,8 @@ export class FavoritesService {
 
     if (artist) {
       artist.isFavorite = true;
-      return this.artistStorage.save(artist);
+      const result = await this.artistStorage.save(artist);
+      return artistResponse(result);
     } else return '';
   }
 
@@ -73,7 +70,8 @@ export class FavoritesService {
 
     if (album) {
       album.isFavorite = true;
-      return this.albumStorage.save(album);
+      const result = await this.albumStorage.save(album);
+      return albumResponse(result);
     } else return '';
   }
 
@@ -82,7 +80,7 @@ export class FavoritesService {
 
     if (track.isFavorite) {
       track.isFavorite = false;
-      return this.trackStorage.save(track);
+      return await this.trackStorage.save(track);
     } else {
       return '';
     }
@@ -93,7 +91,7 @@ export class FavoritesService {
 
     if (album.isFavorite) {
       album.isFavorite = false;
-      return this.albumStorage.save(album);
+      return await this.albumStorage.save(album);
     } else return '';
   }
 
@@ -102,7 +100,7 @@ export class FavoritesService {
 
     if (artist.isFavorite) {
       artist.isFavorite = false;
-      return this.artistStorage.save(artist);
+      return await this.artistStorage.save(artist);
     } else {
       return '';
     }

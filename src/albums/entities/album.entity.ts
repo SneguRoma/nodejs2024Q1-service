@@ -8,6 +8,7 @@ import {
 } from 'typeorm';
 import { Artist } from 'src/artists/entities/artist.entity';
 import { Track } from 'src/tracks/entities/track.entity';
+import { Exclude } from 'class-transformer';
 
 @Entity({ name: 'albums' })
 export class Album {
@@ -30,7 +31,8 @@ export class Album {
   @OneToMany(() => Track, (track) => track.album, { eager: false })
   tracks: Track[];
 
-  @Column({ select: false, default: false })
+  @Exclude()
+  @Column({ default: false })
   isFavorite: boolean;
 
   constructor(partial: Partial<Album>) {

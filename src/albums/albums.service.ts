@@ -4,6 +4,7 @@ import { UpdateAlbumDto } from './dto/update-album.dto';
 import { Album } from './entities/album.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
+import { albumResponse } from './helpers/albumRequest';
 
 @Injectable()
 export class AlbumsService {
@@ -11,11 +12,11 @@ export class AlbumsService {
 
   async create(createAlbumDto: CreateAlbumDto) {
     const newAlbum = await this.storage.save(new Album(createAlbumDto));
-    return newAlbum;
+    return albumResponse(newAlbum);
   }
 
   async findAll() {
-    return await this.storage.find();
+    return (await this.storage.find()).map((album) => albumResponse(album));
   }
 
   async findOne(id: string) {
@@ -30,7 +31,8 @@ export class AlbumsService {
     updatedAlbum.artistId = updateAlbumDto.artistId;
     updatedAlbum.year = updateAlbumDto.year;
     updatedAlbum.name = updateAlbumDto.name;
-    return await this.storage.save(updatedAlbum);
+    const response = await this.storage.save(updatedAlbum);
+    return albumResponse(response);
   }
 
   async remove(id: string) {
