@@ -11,7 +11,7 @@ import { Track } from 'src/tracks/entities/track.entity';
 
 @Entity({ name: 'albums' })
 export class Album {
-  @PrimaryGeneratedColumn('uuid', { name: 'albumId' })
+  @PrimaryGeneratedColumn('uuid' /* , { name: 'albumId' } */)
   id: string;
 
   @Column()
@@ -27,7 +27,7 @@ export class Album {
   @JoinColumn({ name: 'artistId' })
   artist: Artist | string;
 
-  @OneToMany(() => Track, (track) => track.albumId, { eager: false })
+  @OneToMany(() => Track, (track) => track.album, { eager: false })
   tracks: Track[];
 
   constructor(partial: Partial<Album>) {

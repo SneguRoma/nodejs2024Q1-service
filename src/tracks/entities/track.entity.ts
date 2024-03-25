@@ -7,29 +7,33 @@ import {
   ManyToOne,
   PrimaryGeneratedColumn,
 } from 'typeorm';
-import { v4 as uuidv4 } from 'uuid';
 
 @Entity({ name: 'tracks' })
 export class Track {
-  @PrimaryGeneratedColumn('uuid', { name: 'artistId' })
+  @PrimaryGeneratedColumn('uuid', { name: 'trackId' })
   id: string;
 
   @Column()
   name: string;
 
-  @ManyToOne(() => Artist, (artist) => artist.albums, { onDelete: 'SET NULL' })
+  @Column({ nullable: true })
+  artistId: string | null;
+
+  @ManyToOne(() => Artist, (artist) => artist.tracks, { onDelete: 'SET NULL' })
   @JoinColumn({ name: 'artistId' })
-  artistId: Artist | string;
+  artist: Artist;
+
+  @Column({ nullable: true })
+  albumId: string | null;
 
   @ManyToOne(() => Album, (album) => album.tracks, { onDelete: 'SET NULL' })
   @JoinColumn({ name: 'albumId' })
-  albumId: Album | string;
+  album: Album;
 
   @Column()
   duration: number;
 
   constructor(partial: Partial<Track>) {
-    this.id = uuidv4();
     Object.assign(this, partial);
   }
 }

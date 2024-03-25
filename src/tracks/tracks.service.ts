@@ -1,29 +1,40 @@
 import { Injectable } from '@nestjs/common';
-import { TracksStorage } from './store/tracks.storage';
 import { CreateTrackDto } from './dto/create-track.dto';
 import { UpdateTrackDto } from './dto/update-track.dto';
+import { Track } from './entities/track.entity';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
 
 @Injectable()
 export class TracksService {
-  constructor(private storage: TracksStorage) {}
+  constructor(@InjectRepository(Track) private storage: Repository<Track>) {}
 
-  create(createTrackDto: CreateTrackDto) {
-    return this.storage.createTrack(createTrackDto);
+  async create(createTrackDto: CreateTrackDto) {
+    const newTrack = await this.storage.save(new Track(createTrackDto));
+    return newTrack;
   }
 
-  findAll() {
-    return this.storage.get();
+  async findAll() {
+    return await this.storage.find();
   }
 
-  findOne(id: string) {
-    return this.storage.getTrack(id);
+  async findOne(id: string) {
+    const track = await this.storage.findOneBy({ id });
+    if (!track) {
+      return '';
+    }
+    return track;
   }
 
-  update(id: string, updateTrackDto: UpdateTrackDto) {
-    return this.storage.updateTrack(updateTrackDto, id);
+  async update(updatedTrack: Track, updateTrackDto: UpdateTrackDto) {
+    updatedTrack.name = updateTrackDto.name;
+    updatedTrack.artistId = updateTrackDto.artistId;
+    updatedTrack.albumId = updateTrackDto.albumId;
+    updatedTrack.duration = updateTrackDto.duration;
+    return await this.storage.save(updatedTrack);
   }
 
-  remove(id: string) {
-    this.storage.deleteTrack(id);
+  async remove(id: string) {
+    return await this.storage.delete(id);
   }
 }
