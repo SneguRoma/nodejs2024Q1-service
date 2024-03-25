@@ -5,81 +5,70 @@ import {
   Param,
   Delete,
   HttpStatus,
-  Res,
+  HttpException,
+  HttpCode,
 } from '@nestjs/common';
-import { Response } from 'express';
 import { FavoritesService } from './favorites.service';
+import { validate } from 'uuid';
 
 @Controller('favs')
 export class FavoritesController {
   constructor(private favoritesService: FavoritesService) {}
 
   @Post('track/:id')
-  createTrack(@Param('id') id: string, @Res() res: Response) {
-    try {
-      if (id.length !== 36) {
-        return res
-          .status(HttpStatus.BAD_REQUEST)
-          .json({ error: 'Invalid Id format' });
-      } else {
-        const resp = this.favoritesService.addTrack(id);
-        if (resp === 201)
-          return res.status(HttpStatus.CREATED).send('Track added');
-        return res
-          .status(HttpStatus.UNPROCESSABLE_ENTITY)
-          .json({ error: 'track does not exist' });
-      }
-    } catch (err) {
-      console.error('Error in create:', err);
-      return res
-        .status(HttpStatus.INTERNAL_SERVER_ERROR)
-        .json({ error: 'Internal Server Error' });
+  async createTrack(@Param('id') id: string) {
+    const isValidUUID = validate(id);
+    if (!isValidUUID) {
+      throw new HttpException(
+        `The provided ID (${id}) is not a valid UUID`,
+        HttpStatus.BAD_REQUEST,
+      );
+    } else {
+      const resp = await this.favoritesService.addTrack(id);
+      if (resp === '')
+        throw new HttpException(
+          `track does not exist`,
+          HttpStatus.UNPROCESSABLE_ENTITY,
+        );
+      if (resp) return resp;
     }
   }
 
   @Post('album/:id')
-  createAlbum(@Param('id') id: string, @Res() res: Response) {
-    try {
-      if (id.length !== 36) {
-        return res
-          .status(HttpStatus.BAD_REQUEST)
-          .json({ error: 'Invalid Id format' });
-      } else {
-        const resp = this.favoritesService.addAlbum(id);
-        if (resp === 201)
-          return res.status(HttpStatus.CREATED).send('Album added');
-        return res
-          .status(HttpStatus.UNPROCESSABLE_ENTITY)
-          .json({ error: 'album does not exist' });
-      }
-    } catch (err) {
-      console.error('Error in create:', err);
-      return res
-        .status(HttpStatus.INTERNAL_SERVER_ERROR)
-        .json({ error: 'Internal Server Error' });
+  async createAlbum(@Param('id') id: string) {
+    const isValidUUID = validate(id);
+    if (!isValidUUID) {
+      throw new HttpException(
+        `The provided ID (${id}) is not a valid UUID`,
+        HttpStatus.BAD_REQUEST,
+      );
+    } else {
+      const resp = await this.favoritesService.addAlbum(id);
+      if (resp === '')
+        throw new HttpException(
+          `album does not exist`,
+          HttpStatus.UNPROCESSABLE_ENTITY,
+        );
+      if (resp) return resp;
     }
   }
 
   @Post('artist/:id')
-  createArtist(@Param('id') id: string, @Res() res: Response) {
-    try {
-      if (id.length !== 36) {
-        return res
-          .status(HttpStatus.BAD_REQUEST)
-          .json({ error: 'Invalid Id format' });
-      } else {
-        const resp = this.favoritesService.addArtist(id);
-        if (resp === 201)
-          return res.status(HttpStatus.CREATED).send('Artist added');
-        return res
-          .status(HttpStatus.UNPROCESSABLE_ENTITY)
-          .json({ error: 'album does not exist' });
-      }
-    } catch (err) {
-      console.error('Error in create:', err);
-      return res
-        .status(HttpStatus.INTERNAL_SERVER_ERROR)
-        .json({ error: 'Internal Server Error' });
+  async createArtist(@Param('id') id: string) {
+    const isValidUUID = validate(id);
+    if (!isValidUUID) {
+      throw new HttpException(
+        `The provided ID (${id}) is not a valid UUID`,
+        HttpStatus.BAD_REQUEST,
+      );
+    } else {
+      const resp = await this.favoritesService.addArtist(id);
+      if (resp === '')
+        throw new HttpException(
+          `artist does not exist`,
+          HttpStatus.UNPROCESSABLE_ENTITY,
+        );
+      if (resp) return resp;
     }
   }
 
@@ -89,69 +78,59 @@ export class FavoritesController {
   }
 
   @Delete('track/:id')
-  removeTrack(@Param('id') id: string, @Res() res: Response) {
-    try {
-      if (id.length !== 36) {
-        return res
-          .status(HttpStatus.BAD_REQUEST)
-          .json({ error: 'Invalid Id format' });
-      } else {
-        const resp = this.favoritesService.deleteTrack(id);
-        if (resp === 204)
-          return res.status(HttpStatus.NO_CONTENT).send('Track deleted');
-        return res
-          .status(HttpStatus.NOT_FOUND)
-          .json({ error: 'track not found' });
+  @HttpCode(HttpStatus.NO_CONTENT)
+  async deleteTrack(@Param('id') id: string) {
+    const isValidUUID = validate(id);
+    if (!isValidUUID) {
+      throw new HttpException(
+        `The provided ID (${id}) is not a valid UUID`,
+        HttpStatus.BAD_REQUEST,
+      );
+    } else {
+      const resp = await this.favoritesService.deleteTrack(id);
+      if (resp === '') {
+        throw new HttpException(`track not found`, HttpStatus.NOT_FOUND);
       }
-    } catch (err) {
-      console.error('Error in create:', err);
-      return res
-        .status(HttpStatus.INTERNAL_SERVER_ERROR)
-        .json({ error: 'Internal Server Error' });
+
+      if (resp) return resp;
     }
   }
+
   @Delete('album/:id')
-  removeAlbum(@Param('id') id: string, @Res() res: Response) {
-    try {
-      if (id.length !== 36) {
-        return res
-          .status(HttpStatus.BAD_REQUEST)
-          .json({ error: 'Invalid Id format' });
-      } else {
-        const resp = this.favoritesService.deleteAlbum(id);
-        if (resp === 204)
-          return res.status(HttpStatus.NO_CONTENT).send('Album deleted');
-        return res
-          .status(HttpStatus.NOT_FOUND)
-          .json({ error: 'album not found' });
+  @HttpCode(HttpStatus.NO_CONTENT)
+  async deleteAlbum(@Param('id') id: string) {
+    const isValidUUID = validate(id);
+    if (!isValidUUID) {
+      throw new HttpException(
+        `The provided ID (${id}) is not a valid UUID`,
+        HttpStatus.BAD_REQUEST,
+      );
+    } else {
+      const resp = await this.favoritesService.deleteAlbum(id);
+      if (resp === '') {
+        throw new HttpException(`album not found`, HttpStatus.NOT_FOUND);
       }
-    } catch (err) {
-      console.error('Error in create:', err);
-      return res
-        .status(HttpStatus.INTERNAL_SERVER_ERROR)
-        .json({ error: 'Internal Server Error' });
+
+      if (resp) return resp;
     }
   }
+
   @Delete('artist/:id')
-  removeArtist(@Param('id') id: string, @Res() res: Response) {
-    try {
-      if (id.length !== 36) {
-        return res
-          .status(HttpStatus.BAD_REQUEST)
-          .json({ error: 'Invalid Id format' });
-      } else {
-        const resp = this.favoritesService.deleteArtist(id);
-        if (resp === 204)
-          return res.status(HttpStatus.NO_CONTENT).send('Artist deleted');
-        return res
-          .status(HttpStatus.NOT_FOUND)
-          .json({ error: 'album not found' });
+  @HttpCode(HttpStatus.NO_CONTENT)
+  async deleteArtist(@Param('id') id: string) {
+    const isValidUUID = validate(id);
+    if (!isValidUUID) {
+      throw new HttpException(
+        `The provided ID (${id}) is not a valid UUID`,
+        HttpStatus.BAD_REQUEST,
+      );
+    } else {
+      const resp = await this.favoritesService.deleteArtist(id);
+      if (resp === '') {
+        throw new HttpException(`artist not found`, HttpStatus.NOT_FOUND);
       }
-    } catch (err) {
-      console.error('Error in create:', err);
-      return res
-        .status(HttpStatus.INTERNAL_SERVER_ERROR)
-        .json({ error: 'Internal Server Error' });
+
+      if (resp) return resp;
     }
   }
 }

@@ -33,6 +33,9 @@ export class Track {
   @Column()
   duration: number;
 
+  @Column({ select: false, default: false })
+  isFavorite: boolean;
+
   constructor(partial: Partial<Track>) {
     Object.assign(this, partial);
   }

@@ -30,6 +30,9 @@ export class Album {
   @OneToMany(() => Track, (track) => track.album, { eager: false })
   tracks: Track[];
 
+  @Column({ select: false, default: false })
+  isFavorite: boolean;
+
   constructor(partial: Partial<Album>) {
     Object.assign(this, partial);
   }

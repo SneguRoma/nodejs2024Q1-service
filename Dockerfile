@@ -1,5 +1,5 @@
 # Start your image with a node base image
-FROM node:21-alpine
+FROM node:lts-alpine
 
 # The /app directory should act as the main application directory
 WORKDIR /app
@@ -10,7 +10,7 @@ COPY package*.json ./
 # Install node packages
 RUN npm install && npm cache clean --force 
 
-RUN npm install --save @nestjs/config @nestjs/typeorm typeorm
+
 
 # Copy local directories to the current local directory of our docker image (/app)
 COPY . .
@@ -20,4 +20,4 @@ COPY . .
 EXPOSE 4000
 
 # Start the app using serve command
-CMD [ "npm", "run", "start" ]
+CMD [ "npm", "run", "start:dev" ]

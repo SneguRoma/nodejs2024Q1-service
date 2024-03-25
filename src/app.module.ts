@@ -21,6 +21,16 @@ import { Track } from './tracks/entities/track.entity';
     AlbumsModule,
     TracksModule,
     FavoritesModule,
+    /* TypeOrmModule.forRoot({
+      type: 'postgres',
+      host: process.env.POSTGRES_HOST || 'postgres',
+      port: parseInt(process.env.POSTGRES_PORT || '5432'),
+      username: process.env.POSTGRES_USERNAME || 'postgres',
+      password: process.env.POSTGRES_PASSWORD || '123456',
+      database: process.env.POSTGRES_DB || 'postgres',
+      synchronize: true,
+      entities: [User, Album, Track, Artist],
+    }), */
     ConfigModule.forRoot({ isGlobal: true }),
     TypeOrmModule.forRootAsync({
       imports: [ConfigModule],
@@ -33,7 +43,7 @@ import { Track } from './tracks/entities/track.entity';
         password: configService.get('POSTGRES_PASSWORD'),
         database: configService.get('POSTGRES_DB'),
         synchronize: true,
-        entities: [User, Album, Artist, Track], //[join(process.cwd()), '/**/user.entity{.js,.ts}'],
+        entities: [User, Album, Artist, Track],
       }),
     }),
   ],
