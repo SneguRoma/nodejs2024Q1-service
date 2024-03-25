@@ -1,5 +1,5 @@
 # Start your image with a node base image
-FROM node:lts-alpine
+FROM node:18.16-alpine
 
 # The /app directory should act as the main application directory
 WORKDIR /app
@@ -9,8 +9,6 @@ COPY package*.json ./
 
 # Install node packages
 RUN npm install && npm cache clean --force 
-
-
 
 # Copy local directories to the current local directory of our docker image (/app)
 COPY . .
