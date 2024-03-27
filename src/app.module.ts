@@ -14,6 +14,9 @@ import { Album } from './albums/entities/album.entity';
 import { Artist } from './artists/entities/artist.entity';
 import { Track } from './tracks/entities/track.entity'; */
 import { dataSourceOptions } from './data';
+import { LoggingService } from './logger/logging.service';
+import { APP_FILTER } from '@nestjs/core';
+import { CustomExceptionFilter } from './exceprion-filter/custom-exception.filter';
 
 @Module({
   imports: [
@@ -40,6 +43,13 @@ import { dataSourceOptions } from './data';
     }), */
   ],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [
+    AppService,
+    LoggingService,
+    {
+      provide: APP_FILTER,
+      useClass: CustomExceptionFilter,
+    },
+  ],
 })
 export class AppModule {}
