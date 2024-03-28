@@ -15,8 +15,9 @@ import { Artist } from './artists/entities/artist.entity';
 import { Track } from './tracks/entities/track.entity'; */
 import { dataSourceOptions } from './data';
 import { LoggingService } from './logger/logging.service';
-import { APP_FILTER } from '@nestjs/core';
+import { APP_FILTER, APP_INTERCEPTOR } from '@nestjs/core';
 import { CustomExceptionFilter } from './exceprion-filter/custom-exception.filter';
+import { LoggingInterceptor } from './interceptors/logging.interceptor';
 
 @Module({
   imports: [
@@ -49,6 +50,10 @@ import { CustomExceptionFilter } from './exceprion-filter/custom-exception.filte
     {
       provide: APP_FILTER,
       useClass: CustomExceptionFilter,
+    },
+    {
+      provide: APP_INTERCEPTOR,
+      useClass: LoggingInterceptor,
     },
   ],
 })

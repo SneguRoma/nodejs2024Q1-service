@@ -24,6 +24,13 @@ export class CustomExceptionFilter implements ExceptionFilter {
       method: request.method,
       path: request.url,
     };
+
+    this.loggingService.error(
+      `Method: ${request.method} Query: ${request.url}`,
+      JSON.stringify(errResponse),
+      `ExceptionFilter`,
+    );
+
     response.status(status).json(errResponse);
   }
 }

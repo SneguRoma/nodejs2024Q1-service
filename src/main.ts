@@ -9,6 +9,7 @@ import { CustomExceptionFilter } from './exceprion-filter/custom-exception.filte
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   const loggingService = app.get(LoggingService);
+  app.useLogger(loggingService);
   app.useGlobalFilters(new CustomExceptionFilter(loggingService));
 
   process.on('uncaughtException', (error) => {
