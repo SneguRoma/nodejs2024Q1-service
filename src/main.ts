@@ -13,12 +13,12 @@ async function bootstrap() {
   app.useGlobalFilters(new CustomExceptionFilter(loggingService));
 
   process.on('uncaughtException', (error) => {
-    loggingService.logError(error);
+    loggingService.error(error);
     process.exit(1);
   });
 
   process.on('unhandledRejection', (reason, promise) => {
-    loggingService.logError(
+    loggingService.error(
       new Error(`Unhandled Rejection at: ${promise}. Reason: ${reason}`),
     );
   });

@@ -1,9 +1,23 @@
-// logging.service.ts
-import { ConsoleLogger, Injectable, Logger } from '@nestjs/common';
+import { ConsoleLogger, Injectable, LogLevel } from '@nestjs/common';
+
+const levels = [
+  'info',
+  'log',
+  'error',
+  'warn',
+  'debug',
+  'verbose',
+] as LogLevel[];
 
 @Injectable()
-export class LoggingService extends ConsoleLogger {
-  private logger = new Logger('Application');
+export class LoggingService extends ConsoleLogger { 
+  private logLevel: number = parseInt(process.env.MAX_LOG_LEVEL);
+  private maxLogFileSize = process.env.MAX_LOGFILE_SIZE || 10485760;
+
+  constructor() {
+    super();
+    this.setLogLevels(levels.slice(0, this.logLevel));
+  }
 
   logIncomingRequest(
     url: string,
@@ -12,7 +26,7 @@ export class LoggingService extends ConsoleLogger {
     responseData: string,
     time: string,
   ) {
-    this.logger.log(
+    this.log(
       `Incoming request: URL - ${url}, QueryParams - ${JSON.stringify(
         queryParams,
       )}, Body - ${JSON.stringify(body)} ${responseData} ${time}`,
@@ -54,11 +68,6 @@ export class LoggingService extends ConsoleLogger {
 
   logResponse(statusCode: number) {
     console.log('here is 2');
-    this.logger.log(`Response sent with status code: ${statusCode}`);
-  }
-
-  logError(error: Error) {
-    console.log('here is 3');
-    //this.logger.error(error.message, stack, context);
+    this.log(`Response sent with status code: ${statusCode}`);
   }
 }

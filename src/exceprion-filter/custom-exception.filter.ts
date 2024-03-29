@@ -15,7 +15,7 @@ export class CustomExceptionFilter implements ExceptionFilter {
     const request = ctx.getRequest();
     const response = ctx.getResponse();
     const status = HttpStatus.INTERNAL_SERVER_ERROR;
-    this.loggingService.logError(error);
+    this.loggingService.error(error);
 
     const errResponse = {
       statusCode: status,
