@@ -1,4 +1,6 @@
 import { ConsoleLogger, Injectable, LogLevel } from '@nestjs/common';
+import * as fs from 'fs';
+import * as path from 'path';
 
 const levels = [
   'info',
@@ -8,11 +10,14 @@ const levels = [
   'debug',
   'verbose',
 ] as LogLevel[];
+const logFilePath = process.cwd() + '/logs';
 
 @Injectable()
-export class LoggingService extends ConsoleLogger { 
+export class LoggingService extends ConsoleLogger {
   private logLevel: number = parseInt(process.env.MAX_LOG_LEVEL);
-  private maxLogFileSize = process.env.MAX_LOGFILE_SIZE || 10485760;
+  private maxLogFileSize = parseInt(process.env.MAX_LOGFILE_SIZE) || 10485760;
+  private currentLogFile: string;
+  private currentLogFileStream: fs.WriteStream;
 
   constructor() {
     super();
@@ -36,12 +41,16 @@ export class LoggingService extends ConsoleLogger {
   log(message: string) {
     if (this.isLevelEnabled('log')) {
       const formattedMessage = message.toLocaleUpperCase();
+      this.writeLog('log:  ' + formattedMessage);
       super.log(formattedMessage);
     }
   }
 
   error(message: any, stack?: string, context?: string) {
     if (this.isLevelEnabled('error')) {
+      this.writeLog('context: ' + context);
+      this.writeLog('message: ' + message);
+      this.writeLog('Stack: ' + stack);
       super.error('context: ' + context);
       super.error('message: ' + message);
       super.error('Stack: ' + stack);
@@ -50,24 +59,54 @@ export class LoggingService extends ConsoleLogger {
 
   warn(message: string) {
     if (this.isLevelEnabled('warn')) {
+      this.writeLog('Warn: ' + message);
       super.warn('Warn: ' + message);
     }
   }
 
   debug(message: string) {
     if (this.isLevelEnabled('debug')) {
+      this.writeLog('Debug: ' + message);
       super.debug('Debug:   ' + message);
     }
   }
 
   verbose(message: string) {
     if (this.isLevelEnabled('verbose')) {
+      this.writeLog('verbose: ' + message);
       super.verbose('verbose:  ' + message);
     }
   }
 
-  logResponse(statusCode: number) {
-    console.log('here is 2');
-    this.log(`Response sent with status code: ${statusCode}`);
+  writeLog(message: string) {
+    if (!fs.existsSync(logFilePath)) {
+      fs.mkdirSync(logFilePath, { recursive: true });
+    }
+    this.createLogFileStream();
+
+    if (!this.checkLogFileSize()) {
+      this.currentLogFileStream.end();
+      this.createLogFileStream();
+    }
+    this.currentLogFileStream.write(message + '\n');
+  }
+
+  checkLogFileSize() {
+    if (fs.existsSync(this.currentLogFile)) {
+      const stats = fs.statSync(this.currentLogFile);
+      return stats.size < this.maxLogFileSize;
+    }
+    return true;
+  }
+
+  createLogFileStream() {
+    const currentDate = new Date().toISOString().slice(0, 10);
+    const logFileName = `application-${currentDate}.log`;
+
+    this.currentLogFile = path.resolve(logFilePath, logFileName);
+
+    this.currentLogFileStream = fs.createWriteStream(this.currentLogFile, {
+      flags: 'a',
+    });
   }
 }
