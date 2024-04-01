@@ -27,7 +27,7 @@ Create .env file based on .env.example
 ## Run without docker 
 
 ```
-npm start.dev
+npm start:dev
 ```
 
 #### logging level stored in MAX_LOG_LEVEL environment variable ( default: 4)
