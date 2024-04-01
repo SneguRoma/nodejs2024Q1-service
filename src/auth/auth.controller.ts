@@ -5,27 +5,23 @@ import { RefreshDto } from './dto/RefreshDto.dto';
 
 @Controller('auth')
 export class AuthController {
-    constructor(private readonly authService: AuthService) {}
+  constructor(private readonly authService: AuthService) {}
 
-  /* @Post('signup')
+  @Post('signup')
+  @HttpCode(HttpStatus.CREATED)
   async signup(@Body() signupDto: LoginDto) {
     return this.authService.signup(signupDto);
-  } */
+  }
 
   @Post('login')
   @HttpCode(HttpStatus.OK)
   async login(@Body() loginDto: LoginDto) {
-    /* if (!isValidUUID) {
-        throw new HttpException(
-          `The provided ID (${id}) is not a valid UUID`,
-          HttpStatus.BAD_REQUEST,
-        );
-      } */
     return this.authService.login(loginDto.login, loginDto.password);
   }
 
-   /*@Post('refresh')
+  @Post('refresh')
+  @HttpCode(HttpStatus.OK)
   async refresh(@Body() refreshDto: RefreshDto) {
-    return this.authService.refresh(refreshDto);
-  } */
+    return this.authService.refresh(refreshDto.refreshToken);
+  }
 }
