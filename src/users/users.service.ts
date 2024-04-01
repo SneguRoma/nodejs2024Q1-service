@@ -27,6 +27,14 @@ export class UsersService {
     return user;
   }
 
+  async findOneByUsername(login: string) {
+    const user = await this.storage.findOneBy({ login });
+    if (!user) {
+      return '';
+    }
+    return user;
+  }
+
   async update(updatedUser: User, newPass: string) {
     updatedUser.version += 1;
     updatedUser.password = newPass;

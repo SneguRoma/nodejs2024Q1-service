@@ -18,6 +18,7 @@ import { LoggingService } from './logger/logging.service';
 import { APP_FILTER, APP_INTERCEPTOR } from '@nestjs/core';
 import { CustomExceptionFilter } from './exceprion-filter/custom-exception.filter';
 import { LoggingInterceptor } from './interceptors/logging.interceptor';
+import { AuthModule } from './auth/auth.module';
 
 @Module({
   imports: [
@@ -27,6 +28,7 @@ import { LoggingInterceptor } from './interceptors/logging.interceptor';
     TracksModule,
     FavoritesModule,
     TypeOrmModule.forRoot(dataSourceOptions),
+    AuthModule,
     /*  ConfigModule.forRoot({ isGlobal: true }),
     TypeOrmModule.forRootAsync({
       imports: [ConfigModule],

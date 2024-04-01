@@ -2,24 +2,25 @@ import {
   ExceptionFilter,
   Catch,
   ArgumentsHost,
-  HttpStatus,
+  HttpException,
 } from '@nestjs/common';
 import { LoggingService } from 'src/logger/logging.service';
+import { Request, Response } from 'express';
 
-@Catch()
+@Catch(HttpException)
 export class CustomExceptionFilter implements ExceptionFilter {
   constructor(private readonly loggingService: LoggingService) {}
 
-  catch(error: Error, host: ArgumentsHost) {
+  catch(exception: HttpException, host: ArgumentsHost) {
     const ctx = host.switchToHttp();
-    const request = ctx.getRequest();
-    const response = ctx.getResponse();
-    const status = HttpStatus.INTERNAL_SERVER_ERROR;
-    this.loggingService.error(error);
+    const request = ctx.getRequest<Request>();
+    const response = ctx.getResponse<Response>();
+    const status = exception.getStatus();
+    this.loggingService.error(exception);
 
     const errResponse = {
       statusCode: status,
-      message: error.message,
+      message: exception.message,
       date: new Date().toLocaleDateString(),
       method: request.method,
       path: request.url,

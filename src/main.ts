@@ -22,9 +22,12 @@ async function bootstrap() {
       new Error(`Unhandled Rejection at: ${promise}. Reason: ${reason}`),
     );
   });
+
   app.useGlobalPipes(
     new ValidationPipe({
       transform: true,
+      whitelist: true,
+      forbidNonWhitelisted: true,
     }),
   );
 
