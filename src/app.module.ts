@@ -15,10 +15,12 @@ import { Artist } from './artists/entities/artist.entity';
 import { Track } from './tracks/entities/track.entity'; */
 import { dataSourceOptions } from './data';
 import { LoggingService } from './logger/logging.service';
-import { APP_FILTER, APP_INTERCEPTOR } from '@nestjs/core';
+import { APP_FILTER, APP_GUARD, APP_INTERCEPTOR } from '@nestjs/core';
 import { CustomExceptionFilter } from './exceprion-filter/custom-exception.filter';
 import { LoggingInterceptor } from './interceptors/logging.interceptor';
 import { AuthModule } from './auth/auth.module';
+import { JwtAuthGuard } from './auth/guards/jwtAuth.guard';
+import { JwtModule } from '@nestjs/jwt';
 
 @Module({
   imports: [
@@ -29,6 +31,7 @@ import { AuthModule } from './auth/auth.module';
     FavoritesModule,
     TypeOrmModule.forRoot(dataSourceOptions),
     AuthModule,
+    JwtModule,
     /*  ConfigModule.forRoot({ isGlobal: true }),
     TypeOrmModule.forRootAsync({
       imports: [ConfigModule],
@@ -56,6 +59,10 @@ import { AuthModule } from './auth/auth.module';
     {
       provide: APP_INTERCEPTOR,
       useClass: LoggingInterceptor,
+    },
+    {
+      provide: APP_GUARD,
+      useClass: JwtAuthGuard,
     },
   ],
 })
