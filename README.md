@@ -16,18 +16,48 @@ git clone {repository URL}
 ```
 npm install
 ```
-## Change .env.example => .env
-```
-```
+
 ## Running application
+```
+Create .env file based on .env.example 
 
 ```
-npm start
+
+### Please checked this task without Docker, because docker containers are work not stable
+## Run without docker 
+
+```
+npm start.dev
 ```
 
+#### logging level stored in MAX_LOG_LEVEL environment variable ( default: 4)
+#### Max file size stored in MAX_LOGFILE_SIZE environment variable, the value is specified in B, default: 10485760
+#### log files ./logs
+#### 'unhandledRejection' and 'uncaughtException' in main.ts
+
+REST API documentation (swagger)
+```
+http://localhost:4000/doc/
+```
+
+### To run all test with authorization
+
+```
+npm run test:auth
+```
+
+Run next command in your terminal, for building images and docker containers up:
+```
+docker-compose up -d
+```
+
+For vulnerabilities scanning:
+```
+docker:scan
+```
 After starting the app on port (4000 as default) you can open
 in your browser OpenAPI documentation by typing http://localhost:4000/doc/.
-For more information about OpenAPI/Swagger please visit https://swagger.io/.
+
 
 ## Testing
 

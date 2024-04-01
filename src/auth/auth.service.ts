@@ -40,7 +40,7 @@ export class AuthService {
   }
 
   async signup(signupDto: LoginDto) {
-    console.log(process.env.CRYPT_SALT)
+    console.log(process.env.CRYPT_SALT);
     const hashedPassword = await bcrypt.hash(
       signupDto.password,
       +process.env.CRYPT_SALT,
